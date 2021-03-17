@@ -11,7 +11,13 @@ class Camera():
         self.root.geometry('1000x800')
 
         self.my_canvas = Canvas(self.root, width=900, height=700, bg='white')
-        self.my_canvas.pack(pady=50)
+        self.my_canvas.pack(pady=70)
+
+        w = Label(self.root, text='''Keys: 
+        WSADCF - walking around (up, down, left, right, front, back)
+        QERTGH - rotating
+        ''')
+        w.place(x=300, y=0)
 
         self.lines = []
         self.lines_coords = []
@@ -38,8 +44,6 @@ class Camera():
         self.root.mainloop()
 
     def key_pressed(self, event):
-        w = Label(self.root, text='Key pressed: ' + event.char)
-        w.place(x=300, y=0)
         if event.char == 'd':
             move(self.lines_coords, 'left')
         elif event.char == 'a':
