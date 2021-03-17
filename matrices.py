@@ -38,7 +38,7 @@ def rotateZ(x):
     ])
 
 
-def zoom(x):
+def mzoom(x):
     return np.array([
         [x, 0, 0, 0],
         [0, x, 0, 0],
@@ -80,8 +80,8 @@ def getOrthViewVolume(width, height):
         'r': width/2,
         'b': -height/2,
         't': height/2,
-        'n': -900,
-        'f': -1000
+        'n': -700,
+        'f': -1100
     }
 
 

@@ -37,5 +37,14 @@ def rotate(coords, angle, axis):
         coords[index] = (new_cords1, new_cords2)
 
 
-def move_vect(vect, direction):
-    vect = trans(*MOVE_DIRECTION[direction]).dot(vect.T)
+def zoom(coords, coef):
+    for index, coord in enumerate(coords):
+        new_cords1 = np.array(
+            [[coord[0][0][0]], [coord[0][1][0]], [coord[0][2][0]], [1]])
+        new_cords2 = np.array(
+            [[coord[1][0][0]], [coord[1][1][0]], [coord[1][2][0]], [1]])
+
+        new_cords1 = mzoom(coef).dot(new_cords1)
+        new_cords2 = mzoom(coef).dot(new_cords2)
+
+        coords[index] = (new_cords1, new_cords2)

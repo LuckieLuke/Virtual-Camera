@@ -25,29 +25,28 @@ class Camera():
                     end = np.array([[*coords[3:], 1]]).T
 
                     self.lines_coords.append((start, end))
-                    if start[2][0] == -50 and end[2][0] == -50:
+                    if (start[2][0] == -10 and end[2][0] == -10) or (start[2][0] == -210 and end[2][0] == -210):
                         color = "red"
-                    elif start[2][0] == -100 and end[2][0] == -100:
+                    elif (start[2][0] == -110 and end[2][0] == -110) or (start[2][0] == -310 and end[2][0] == -310):
                         color = "green"
                     else:
                         color = "blue"
-                    if start[0][0] == 20 and start[1][0] == 20 and start[2][0] == -50 and end[0][0] == 20 and end[1][0] == 70 and end[2][0] == -50:
-                        color = "black"
+
                     self.lines.append(
-                        self.my_canvas.create_line(start[0][0], start[1][0], end[0][0], end[1][0], fill=color))
+                        self.my_canvas.create_line(start[0][0], start[1][0], end[0][0], end[1][0], fill=color, width=2))
         self.render()
         self.root.mainloop()
 
     def key_pressed(self, event):
         w = Label(self.root, text='Key pressed: ' + event.char)
         w.place(x=300, y=0)
-        if event.char == 'a':
+        if event.char == 'd':
             move(self.lines_coords, 'left')
-        elif event.char == 'd':
+        elif event.char == 'a':
             move(self.lines_coords, 'right')
-        elif event.char == 'w':
-            move(self.lines_coords, 'up')
         elif event.char == 's':
+            move(self.lines_coords, 'up')
+        elif event.char == 'w':
             move(self.lines_coords, 'down')
         elif event.char == 'c':
             move(self.lines_coords, 'front')
@@ -65,6 +64,10 @@ class Camera():
             rotate(self.lines_coords, -0.01, 'y')
         elif event.char == 'g':
             rotate(self.lines_coords, 0.01, 'y')
+        elif event.char == 'p':
+            zoom(self.lines_coords, 2)
+        elif event.char == 'l':
+            zoom(self.lines_coords, 0.5)
         self.render()
 
     def render(self):
@@ -83,9 +86,9 @@ class Camera():
             orth_view['f']
         )
         Mcam = np.array([
-            [1, 0, 0, -450],
-            [0, 1, 0, -350],
-            [0, 0, 1, -500],
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
             [0, 0, 0, 1]
         ])
 
