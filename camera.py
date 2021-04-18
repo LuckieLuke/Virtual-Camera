@@ -1,7 +1,6 @@
 from matrices import *
 import utils
 from tkinter import *
-from functools import cmp_to_key
 
 
 class Camera():
@@ -39,7 +38,7 @@ class Camera():
                             a[0][0], a[1][0],
                             b[0][0], b[1][0],
                             c[0][0], c[1][0],
-                            fill='blue',
+                            fill='green',
                             outline='red'
                         )
                     )
@@ -49,40 +48,28 @@ class Camera():
     def key_pressed(self, event):
         if event.char == 'd':
             utils.move(self.triangles_coords, 'left')
-            # utils.move_cam('right')
         elif event.char == 'a':
             utils.move(self.triangles_coords, 'right')
-            # utils.move_cam('left')
         elif event.char == 's':
             utils.move(self.triangles_coords, 'up')
-            # utils.move_cam('down')
         elif event.char == 'w':
             utils.move(self.triangles_coords, 'down')
-            # utils.move_cam('up')
         elif event.char == 'c':
             utils.move(self.triangles_coords, 'front')
-            # utils.move_cam('back')
         elif event.char == 'f':
             utils.move(self.triangles_coords, 'back')
-            # utils.move_cam('front')
         elif event.char == 'q':
             utils.rotate(self.triangles_coords, -0.01, 'z')
-            #utils.rotate_cam(0.01, 'z')
         elif event.char == 'e':
             utils.rotate(self.triangles_coords, 0.01, 'z')
-            #utils.rotate_cam(-0.01, 'z')
         elif event.char == 'r':
             utils.rotate(self.triangles_coords, -0.01, 'x')
-            #utils.rotate_cam(0.01, 'x')
         elif event.char == 't':
             utils.rotate(self.triangles_coords, 0.01, 'x')
-            #utils.rotate_cam(-0.01, 'x')
         elif event.char == 'h':
             utils.rotate(self.triangles_coords, -0.01, 'y')
-            #utils.rotate_cam(0.01, 'y')
         elif event.char == 'g':
             utils.rotate(self.triangles_coords, 0.01, 'y')
-            #utils.rotate_cam(-0.01, 'y')
         elif event.char == 'p':
             utils.zoom(self.triangles_coords, 2)
         elif event.char == 'l':
@@ -107,40 +94,22 @@ class Camera():
 
         M = Morth.dot(P)
         M = MVP.dot(M)
-        # screen_triangles = []
 
-        # for index, coord in enumerate(self.triangles_coords):
-        #     screen_coords_a = M.dot(coord[0])
-        #     screen_coords_b = M.dot(coord[1])
-        #     screen_coords_c = M.dot(coord[2])
-
-        #     screen_triangles.append(
-        #         (screen_coords_a, screen_coords_b, screen_coords_c, self.triangles[index]))
-
-        self.triangles_coords = sorted(
-            self.triangles_coords, key=cmp_to_key(is_closer))
-        # for triangle in self.triangles_coords:
-        #     print(triangle[3])
-        # print(self.triangles_coords)
-
-        # print(screen_triangles)
-        # print(self.triangles)
+        self.triangles_coords = posortuj(self.triangles_coords)
 
         self.my_canvas.delete("all")
 
-        for index, coord in enumerate(self.triangles_coords):
+        for coord in self.triangles_coords:
             screen_coords_a = M.dot(coord[0])
             screen_coords_b = M.dot(coord[1])
             screen_coords_c = M.dot(coord[2])
-            # print(screen_triangle[3])
-            # self.my_canvas.coords(self.triangles[screen_triangle[3]-1], [
-            #     int(screen_triangle[0][0] / screen_triangle[0][3]),
-            #     int(screen_triangle[0][1] / screen_triangle[0][3]),
-            #     int(screen_triangle[1][0] / screen_triangle[1][3]),
-            #     int(screen_triangle[1][1] / screen_triangle[1][3]),
-            #     int(screen_triangle[2][0] / screen_triangle[2][3]),
-            #     int(screen_triangle[2][1] / screen_triangle[2][3])
-            # ])
+            color = 'blue'
+            if coord[3] < 37:
+                color = 'green'
+            if coord[3] < 25:
+                color = 'pink'
+            if coord[3] < 13:
+                color = 'yellow'
 
             self.my_canvas.create_polygon(
                 int(screen_coords_a[0] / screen_coords_a[3]),
@@ -149,12 +118,12 @@ class Camera():
                 int(screen_coords_b[1] / screen_coords_b[3]),
                 int(screen_coords_c[0] / screen_coords_c[3]),
                 int(screen_coords_c[1] / screen_coords_c[3]),
-                fill='blue',
+                fill=color,
                 outline='red'
             )
 
 
-def is_closer(plane, check, *zapychadelko):
+def is_closer(plane, check):
     p1 = np.array(plane[0])
     p2 = np.array(plane[1])
     p3 = np.array(plane[2])
@@ -172,22 +141,35 @@ def is_closer(plane, check, *zapychadelko):
     d = np.dot(cp, p3[:3])
 
     cam_dir = 1 if a * \
-        utils.camera_coords[0][3] + b*utils.camera_coords[1][3] + c*utils.camera_coords[2][3] - d >= 0 else -1
+        utils.camera_coords[0][3] + b*utils.camera_coords[1][3] + c*utils.camera_coords[2][3] - d > 0 else -1
 
-    tr_dir1 = a*cp1[0] + b*cp1[1] + c*cp1[2] - d
-    tr_dir2 = a*cp2[0] + b*cp2[1] + c*cp2[2] - d
-    tr_dir3 = a*cp3[0] + b*cp3[1] + c*cp3[2] - d
+    tr_dir1 = a*(cp1[0]/1e5) + b*(cp1[1]/1e5) + c*(cp1[2]/1e5) - d/1e5
+    tr_dir2 = a*(cp2[0]/1e5) + b*(cp2[1]/1e5) + c*(cp2[2]/1e5) - d/1e5
+    tr_dir3 = a*(cp3[0]/1e5) + b*(cp3[1]/1e5) + c*(cp3[2]/1e5) - d/1e5
 
     results = [np.round(x, 6) for x in [tr_dir1, tr_dir2, tr_dir3]]
 
-    # if plane[3] == 10 and check[3] == 25:
-    #     print(f'{tr_dir1} {tr_dir2} {tr_dir3}')
+    for i in range(len(results)):
+        if results[i] > 0:
+            results[i] = 1
+        elif results[i] == 0:
+            results[i] = 0
+        else:
+            results[i] = -1
 
     if not any(results):
-        return 0
+        return 1
 
-    # print(results)
     check = [x for x in results if x != 0]
     if cam_dir * check[0] < 0:
         return 1
     return -1
+
+
+def posortuj(arr):
+    n = len(arr)
+    for i in range(n-1):
+        for j in range(0, n-i-1):
+            if is_closer(arr[j], arr[j+1]) == 1:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+    return arr
