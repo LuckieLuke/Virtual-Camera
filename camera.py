@@ -1,3 +1,4 @@
+import math
 from matrices import *
 import utils
 from tkinter import *
@@ -59,17 +60,17 @@ class Camera():
         elif event.char == 'f':
             utils.move(self.triangles_coords, 'back')
         elif event.char == 'q':
-            utils.rotate(self.triangles_coords, -0.01, 'z')
+            utils.rotate(self.triangles_coords, -0.05, 'z')
         elif event.char == 'e':
-            utils.rotate(self.triangles_coords, 0.01, 'z')
+            utils.rotate(self.triangles_coords, 0.05, 'z')
         elif event.char == 'r':
-            utils.rotate(self.triangles_coords, -0.01, 'x')
+            utils.rotate(self.triangles_coords, -0.05, 'x')
         elif event.char == 't':
-            utils.rotate(self.triangles_coords, 0.01, 'x')
+            utils.rotate(self.triangles_coords, 0.05, 'x')
         elif event.char == 'h':
-            utils.rotate(self.triangles_coords, -0.01, 'y')
+            utils.rotate(self.triangles_coords, -0.05, 'y')
         elif event.char == 'g':
-            utils.rotate(self.triangles_coords, 0.01, 'y')
+            utils.rotate(self.triangles_coords, 0.05, 'y')
         elif event.char == 'p':
             utils.zoom(self.triangles_coords, 2)
         elif event.char == 'l':
@@ -121,6 +122,50 @@ class Camera():
                 fill=color,
                 outline='red'
             )
+
+            maxs = find_max(coord)
+            not_to_draw = []
+
+            if maxs == 'ab':
+                not_to_draw = [
+                    int(screen_coords_a[0] / screen_coords_a[3]),
+                    int(screen_coords_a[1] / screen_coords_a[3]),
+                    int(screen_coords_b[0] / screen_coords_b[3]),
+                    int(screen_coords_b[1] / screen_coords_b[3])
+                ]
+            elif maxs == 'bc':
+                not_to_draw = [
+                    int(screen_coords_b[0] / screen_coords_b[3]),
+                    int(screen_coords_b[1] / screen_coords_b[3]),
+                    int(screen_coords_c[0] / screen_coords_c[3]),
+                    int(screen_coords_c[1] / screen_coords_c[3])
+                ]
+            else:
+                not_to_draw = [
+                    int(screen_coords_a[0] / screen_coords_a[3]),
+                    int(screen_coords_a[1] / screen_coords_a[3]),
+                    int(screen_coords_c[0] / screen_coords_c[3]),
+                    int(screen_coords_c[1] / screen_coords_c[3])
+                ]
+
+            self.my_canvas.create_line(not_to_draw, fill=color)
+
+
+def find_max(triangle):
+    ax, ay, az, _ = triangle[0]
+    bx, by, bz, _ = triangle[1]
+    cx, cy, cz, _ = triangle[2]
+
+    len_ab = math.sqrt((ax-bx)**2 + (ay-by)**2 + (az-bz)**2)
+    len_bc = math.sqrt((bx-cx)**2 + (by-cy)**2 + (bz-cz)**2)
+    len_ca = math.sqrt((cx-ax)**2 + (cy-ay)**2 + (cz-az)**2)
+
+    if len_ab > len_bc and len_ab > len_ca:
+        return 'ab'
+    elif len_bc > len_ab and len_bc > len_ca:
+        return 'bc'
+    else:
+        return 'cz'
 
 
 def is_closer(plane, check):
